@@ -1,3 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">Alalay</string>
+    <string name="accessibility_service_label">Alalay Screen Control</string>
+    <string name="accessibility_service_description">Lets Alalay read the screen and tap, scroll, and type on your behalf after you ask it to. Everything stays on this phone.</string>
 </resources>

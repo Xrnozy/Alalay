@@ -28,6 +28,7 @@ All items are committed to the MVP. Priority P0 unless marked P1 — P1 items ar
 | 11 | Diagnostics screen: model identity, last inference ms, network status, pipeline state | FR-11 |
 | 12 | Memory: alias table + preferences + last-contact context (user-approved writes only) — **P1** | FR-10 |
 | 13 | First-time setup flow (accessibility enable incl. restricted-settings path, mic permission, model + TTS presence check) — **P1** | FR-14 |
+| 14 | Model weights bundled inside the app — MiniCPM5-1B planner (GGUF) + whisper-small STT; works offline immediately after install, no download step | NFR-01, DEC-06/07/11 |
 
 ## 2. Officially Supported Commands
 

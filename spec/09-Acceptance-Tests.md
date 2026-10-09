@@ -95,9 +95,9 @@ Each test lists **preconditions → steps → expected → pass/fail criterion**
 ## AT-13 — Setup flow + resource budget (FR-14, NFR-06)
 
 - **Preconditions:** fresh install of release APK (side-loaded).
-- **Steps:** 1) Follow spoken onboarding: accessibility enable (hit restricted-settings block on purpose), mic grant, model check, TTS check. 2) After install, check `adb shell du -sh /data/data/com.alalay.app` + model dir total ≤4 GB; run CMD-01 while watching `dumpsys meminfo` — no OOM/low-memory killer events.
-- **Expected:** app detects the restriction and guides through "Allow restricted settings"; blocks agent features until service + model + voice all pass; footprint within budget.
-- **Pass:** a non-developer can complete setup in ≤5 min following the app's guidance alone; app+models ≤4 GB; no OOM during a command run.
+- **Steps:** 1) Follow spoken onboarding: accessibility enable (hit restricted-settings block on purpose), mic grant, bundled-model extraction + check, TTS check — all offline. 2) After install, check `adb shell du -sh /data/data/com.alalay.app` + APK size ≤3 GB total; run CMD-01 while watching `dumpsys meminfo` — no OOM/low-memory killer events.
+- **Expected:** app detects the restriction and guides through "Allow restricted settings"; agent features run immediately after install with no download step; footprint within budget.
+- **Pass:** a non-developer can complete setup in ≤5 min following the app's guidance alone; total install footprint (APK + extracted models) ≤3 GB; no OOM during a command run.
 
 ---
 

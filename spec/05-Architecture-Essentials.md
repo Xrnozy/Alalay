@@ -25,7 +25,7 @@ Every action is followed by a fresh dump and a check (app foregrounded? field co
 *Why:* the product promise is honesty; "Done" means "verified on screen," not "the tool returned true."
 
 ## D-6. Everything offline, verifiably.
-STT (whisper.cpp), planner (LiteRT-LM / llama.cpp), TTS (system offline voice) all on-device; the demo runs in airplane mode and the diagnostics screen proves it.
+STT (whisper.cpp small multilingual), planner (MiniCPM5-1B via llama.cpp / LiteRT-LM alternate), TTS (system offline voice) all on-device with weights bundled in the APK; the demo runs in airplane mode and the diagnostics screen proves it.
 *Why:* it is 25% of the judging weight **and** the privacy promise — both collapse if a packet leaves.
 
 ## D-7. Privacy by construction, not policy.

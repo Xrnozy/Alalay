@@ -1,15 +1,51 @@
-*.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
+# ─── Alalay .gitignore ───
+
+# Gradle / build outputs
+.gradle/
+build/
+*/build/
+app/build/
+app/release/
 local.properties
+*.iml
+
+# Android Studio / IDE
+.idea/
+.cxx/
+.externalNativeBuild/
+navigation/
+captures/
+output.json
+
+# Signing — never commit keystores or credentials
+*.jks
+*.keystore
+keystore.properties
+google-services.json
+
+# ─── On-device models — large binaries, never committed ───
+# Distribute via device storage / pre-event USB copy (see spec/06-TRD §7)
+*.gguf
+*.litertlm
+*.task
+models/
+files/models/
+app/src/main/assets/models/
+*-model.bin
+whisper-*.bin
+
+# OS / misc
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.bak
+
+# Kotlin/Native & NDK artifacts
+.kotlin/
+*.so.d/
+
+# Test outputs
+*.hprof
+test-results/
+reports/

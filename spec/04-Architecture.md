@@ -18,7 +18,7 @@ flowchart TB
     end
 
     subgraph PIPE["Agent Pipeline"]
-        VIN[VoiceInput<br/>whisper.cpp STT]
+        VIN[VoiceInput<br/>whisper.cpp STT<br/>whisper-small multilingual]
         RTR[Router<br/>deterministic rules]
         ORC[Orchestrator<br/>local LLM client]
         VAL[SafetyGate<br/>validator + allowlist + confirm FSM]
@@ -32,7 +32,7 @@ flowchart TB
         MEM[MemoryStore<br/>SQLite/Room]
     end
 
-    LLM[[Local LLM<br/>Gemma E2B / LiteRT-LM<br/>fallback: llama.cpp GGUF]]
+    LLM[[Local LLM<br/>MiniCPM5-1B / llama.cpp GGUF<br/>alternate: LiteRT-LM .litertlm]]
 
     PTT --> VIN --> RTR
     RTR -->|control utterance| LOOP

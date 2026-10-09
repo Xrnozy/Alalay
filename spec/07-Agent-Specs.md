@@ -77,7 +77,7 @@ Rules:
 | `say` | string | yes | ≤120 chars; spoken before executing |
 | `confidence` | number 0–1 | yes | <0.4 → treated as low-confidence (§7) |
 
-Serialization: canonical JSON, UTF-8. Parsing must reject trailing prose; when LiteRT-LM constrained decoding is used, the grammar enforces the shape — the validator still double-checks.
+Serialization: canonical JSON, UTF-8. Parsing must reject trailing prose; the validator is the enforcement on the primary llama.cpp path — when a grammar-capable runtime (LiteRT-LM constrained decoding) is used, the grammar additionally forces the shape but the validator still double-checks.
 
 ## 4. Prompt Assembly Rules (small-model budget)
 

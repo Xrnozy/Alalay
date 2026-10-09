@@ -18,7 +18,7 @@
 | 3 | If Android blocks the toggle (sideloaded APK "restricted settings"), app shows guidance card and a button to App Info | "Android needs one extra step. In the app info screen, tap the three dots, then Allow restricted settings. Then come back." |
 | 4 | Service enabled → app auto-detects | "Screen control is on." |
 | 5 | Requests RECORD_AUDIO | "I need the microphone to hear your commands." |
-| 6 | Checks model file presence + runs 1-token smoke inference; checks offline TTS voice | "Checking my brain… Local model ready. Voice ready." |
+| 6 | Extracts bundled model weights (first launch only), verifies SHA, runs 1-token smoke inference; checks offline TTS voice | "Checking my brain… Local model ready. Voice ready." |
 | 7 | Optional alias teaching: "You can teach me names, like Mama means Remedios Domingo. Want to add one?" | user speaks alias → repeats back → "Save this? Say yes or no." → stores only on yes (FR-10) |
 | 8 | Done | "Setup complete. Press and hold the button, then tell me what to do." |
 
@@ -31,7 +31,7 @@ flowchart TD
     E --> C
     D -- no --> C
     B -- yes --> F[Request mic permission]
-    F --> G{Model file present + smoke inference OK?}
+    F --> G{Bundled model extracted + smoke inference OK?}
     G -- no --> H[Speak: model missing, load via Files] --> G
     G -- yes --> I{Offline TTS voice installed?}
     I -- no --> J[Speak instructions to install voice data]

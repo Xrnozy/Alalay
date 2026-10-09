@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="thread_row" type="id" />
+    <item name="thread_title" type="id" />
+    <item name="message_list" type="id" />
+    <item name="message_text" type="id" />
+    <item name="compose_field" type="id" />
+    <item name="send_button" type="id" />
+</resources>

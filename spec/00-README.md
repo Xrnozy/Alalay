@@ -36,19 +36,19 @@
 | DEC-03 | Final product name + package id | ASSUMPTION: "Alalay", `com.alalay.app`, service label "Alalay Screen Control" | T-05 |
 | DEC-04 | Official command list = CMD-01..05 and Taglish phrasing | Per 02-§2 | T-05 |
 | DEC-05 | Native Kotlin (not Flutter) confirmed | ASSUMPTION: yes, per 06-TRD §0.5 | T-05 |
-| DEC-06 | Primary model identity | "Gemma 4 E2B / LiteRT-LM" — **VERIFY** availability; else Gemma 3n E2B → Qwen3 1.7B → Llama 3.2 3B | T-02 |
-| DEC-07 | whisper.cpp Taglish accuracy sufficient | ASSUMPTION yes; else SpeechRecognizer offline fallback | T-03 |
+| DEC-06 | Primary model identity | **RESOLVED:** MiniCPM5-1B (openbmb, Apache-2.0) via llama.cpp GGUF Q4_K_M. Eval 2026-10 vs Gemma/LiteRT-LM path — see 06-TRD §2. Fallback: Qwen3 1.7B → Gemma 3 1B | T-02 |
+| DEC-07 | STT model identity | **RESOLVED:** whisper `small` multilingual via whisper.cpp (MIT). CrisperWhisper 2.0 Small rejected — EN/DE only (no Tagalog) + non-commercial-research weights license; see 06-TRD §2. SpeechRecognizer `preferOffline` remains the runtime fallback | T-03 |
 | DEC-08 | Offline TTS voice present on target device | VERIFY in airplane mode | T-04 |
 | DEC-09 | private-agent license — no LICENSE file exists | Treat as reference-only, attribute, rewrite patterns; ask author for terms | team lead |
 | DEC-10 | PTT trigger mechanism: on-screen button vs. volume-key long-press | ASSUMPTION: on-screen hold button (simplest, eyes-free friendly) | T-07 |
-| DEC-11 | Model files staged on device storage before event start | Required — no venue-download dependency | pre-event |
+| DEC-11 | Model delivery to the device | **RESOLVED:** weights bundled inside the app (`assets/models/`, noCompress) → extracted to `files/models/` + verified on first launch. No download step, no pre-event staging. Play-Store path: install-time asset pack (06-TRD §6) | pre-event |
 
 ## First 2 Hours Checklist (Phase P0 — risk-first, per 08-§2)
 
-- [ ] **H0:00** Assign spikes; confirm device + models physically present (DEC-11)
+- [ ] **H0:00** Assign spikes; confirm device RAM (DEC-01) + bundled-model APK builds and installs (DEC-11)
 - [ ] **H0:15** T-01: accessibility service dump on Messenger AND a stub list app — can we read elements and click?
-- [ ] **H0:45** T-02: load LLM on the target phone; run 20 prompts; record latency + % valid JSON
-- [ ] **H1:15** T-03: whisper.cpp transcribes the 10 scripted utterances in airplane mode — note WER on CMD phrases
+- [ ] **H0:45** T-02: load MiniCPM5-1B on the target phone; run 20 prompts; record latency + % valid JSON
+- [ ] **H1:15** T-03: whisper-small transcribes the 10 scripted utterances in airplane mode — note WER on CMD phrases
 - [ ] **H1:30** T-04: TTS speaks with airplane mode ON
 - [ ] **H1:45** T-05: freeze DEC-01..10; write them into this README; adjust scope per spike results (fallbacks per 06-TRD §2 / cut-line 02-§7)
 - [ ] **H2:00** Go/no-go gate: if LLM spike failed → invoke T-23 rules-only planner; if Messenger failed → commit to demo messenger; then start P1

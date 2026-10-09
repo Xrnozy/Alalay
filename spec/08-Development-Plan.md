@@ -37,8 +37,8 @@ Estimates in hours. `||` = parallelizable. Deps = must finish first.
 | ID | Task | Est | Phase | Deps |
 |---|---|---|---|---|
 | T-01 | Spike: dump UI tree of Messenger + click a thread; same on a throwaway list app | 1.0 | P0 | device in hand |
-| T-02 | Spike: LiteRT-LM (or llama.cpp) hello-world inference on target phone; 20-prompt JSON validity + latency bench | 1.0 || T-01 | P0 | model file present |
-| T-03 | Spike: whisper.cpp tiny/base transcribe 10 recorded Taglish utterances, airplane mode | 0.75 || | P0 | model file present |
+| T-02 | Spike: llama.cpp hello-world inference of MiniCPM5-1B (GGUF Q4_K_M) on target phone; 20-prompt JSON validity + latency bench; evaluate `.litertlm` build only if validity <80% | 1.0 || T-01 | P0 | bundled model APK installed |
+| T-03 | Spike: whisper.cpp small (multilingual) transcribe 10 recorded Taglish utterances, airplane mode | 0.75 || | P0 | bundled model APK installed |
 | T-04 | Spike: TTS offline voice check; airplane-mode TTS speak | 0.25 || | P0 | — |
 | T-05 | Freeze decisions DEC-01..04; record in 00-README | 0.5 | P0 | T-01..04 |
 | T-06 | Alalay Demo Messenger: thread list → thread view → compose field (seeded: 2× "Mama"-matchable contacts for ambiguity demo, Rosa×2) | 3.0 || from H2 | P1 | — |
@@ -62,6 +62,7 @@ Estimates in hours. `||` = parallelizable. Deps = must finish first.
 | T-24 | AT matrix runs on device; fix-forward | 2.0 | P3→P4 | all P0 tasks |
 | T-25 | Demo rehearsal ×3, backup video in airplane mode | 1.5 | P4 | T-24 |
 | T-26 | Slide/pitch polish + README | 1.0 || | P4 | — |
+| T-27 | Model bundling: weights under `assets/models/` (noCompress), ModelStore first-launch extraction + SHA verify, size accounting vs 3 GB budget | 1.0 || | P1 | T-07 |
 
 Sum ≈ 33 h of tasks — parallelize `||` items across teammates; a solo dev should pre-cut FR-10/FR-14 polish per 02-§7 cut-line.
 

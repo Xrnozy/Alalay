@@ -84,9 +84,9 @@ Native Android `AccessibilityService` — **no ADB, no PC, no root required.** `
 |---|---|---|---|
 | Language / UI | Kotlin, Jetpack Compose, single-activity app | Kotlin 2.x, AGP 8.x, compileSdk 35 (VERIFY latest stable) | Apache-2.0 |
 | Min SDK | API 29 (Android 10) — covers `dispatchGesture`, screenshot API (30+ degrades gracefully) | — | — |
-| LLM runtime (primary) | Google **LiteRT-LM** (AI Edge) with function calling / constrained decoding | VERIFY current release | Apache-2.0 |
-| LLM runtime (fallback) | **llama.cpp** Android JNI (GGUF, Q4_K_M) | pin a tag ≥7 days old (VERIFY) | MIT |
-| STT | **whisper.cpp** JNI, tiny or base multilingual model | pin a tag ≥7 days old (VERIFY) | MIT |
+| LLM runtime (primary) | **llama.cpp** Android JNI (GGUF, Q4_K_M) — MiniCPM5-1B ships official GGUF on a stock `LlamaForCausalLM` arch | pin a tag ≥7 days old (VERIFY) | MIT |
+| LLM runtime (alternate) | Google **LiteRT-LM** (AI Edge) with constrained decoding | VERIFY current release; community `.litertlm` build exists | Apache-2.0 |
+| STT | **whisper.cpp** JNI, `small` multilingual model (`base` if RAM tight) | pin a tag ≥7 days old (VERIFY) | MIT |
 | TTS | Android `TextToSpeech` w/ installed offline voice | system | — |
 | DB | Room (SQLite) | stable | Apache-2.0 |
 | Async | kotlinx-coroutines | stable | Apache-2.0 |
@@ -94,25 +94,35 @@ Native Android `AccessibilityService` — **no ADB, no PC, no root required.** `
 
 **No networking library is added.** Release manifest omits `android.permission.INTERNET`; if a dependency pulls it in transitively, remove it via manifest merger `tools:node="remove"` and lint-check.
 
-## 2. Model Selection and Fallbacks (VERIFY each name/format at event time)
+## 2. Model Selection and Fallbacks (evaluated 2026-10 — DEC-06/DEC-07 resolved)
 
 | Slot | Model | Runtime | Format | Size est. | Status |
 |---|---|---|---|---|---|
-| Primary | **Gemma 4 E2B** (per project direction) | LiteRT-LM | `.litertlm` / task bundle | ~2–3 GB | **VERIFY** existence/availability; if absent, use Gemma 3n E2B which is known-good on LiteRT-LM |
-| Alt-primary | Gemma E4B | LiteRT-LM | same | ~4 GB | Only if target device RAM ≥12 GB |
-| Fallback A | Qwen3 1.7B (instruct) | llama.cpp | GGUF Q4_K_M | ~1.1 GB | VERIFY tag |
-| Fallback B | Llama 3.2 3B Instruct | llama.cpp | GGUF Q4_K_M | ~2 GB | VERIFY tag/license (Llama license) |
-| STT | whisper `base` multilingual (tiny if RAM tight) | whisper.cpp | ggml bin | ~142 MB (base) | VERIFY Tagalog WER in hour-0 spike |
+| Primary planner | **MiniCPM5-1B** (openbmb) | llama.cpp | GGUF Q4_K_M | ~0.7 GB | **SELECTED** — Apache-2.0 weights, official GGUF build, plain `LlamaForCausalLM` arch (no custom ops), tool-calling + `/no_think`-style terse mode |
+| Alt-primary | MiniCPM5-1B `.litertlm` | LiteRT-LM | litertlm bundle | ~0.7 GB | Community build exists — VERIFY on target if grammar-forced JSON is wanted |
+| Fallback A | Qwen3 1.7B (instruct) | llama.cpp | GGUF Q4_K_M | ~1.1 GB | Stronger multilingual (better Taglish); swap if MiniCPM5-1B task comprehension is poor in the spike |
+| Fallback B | Gemma 3 1B it | LiteRT-LM | `.litertlm` | ~0.7 GB | Gemma ToU license (redistribution allowed w/ terms); weak multilingual |
+| STT | whisper `small` multilingual | whisper.cpp | ggml bin (q5_1) | ~190 MB | **SELECTED** — MIT weights, `tl` language support, proven Android JNI path |
+| STT (RAM-tight) | whisper `base` multilingual | whisper.cpp | ggml bin (q5_0) | ~57 MB | Use if the 4 GB-RAM floor proves tight; expect higher WER |
 | STT fallback | Android `SpeechRecognizer` `preferOffline` | system | — | — | VERIFY offline pack exists on device |
 
-Selection rule: prefer LiteRT-LM path for constrained decoding (grammar-forced JSON = fewer parse failures). If LiteRT-LM tool-calling proves unstable in the spike, switch to llama.cpp + a strict output contract with our validation (07-Agent-Specs §5).
+### 2.1 Rejected candidates (evaluation record)
+
+| Candidate | Verdict | Reason |
+|---|---|---|
+| **CrisperWhisper 2.0 Small** (nyralabs) | **Rejected for STT** | Language support is `en, de` only — no Filipino/Tagalog, which breaks FR-01 Taglish commands. Weights are under the nyra health Non-Commercial Research License (redistribution/commercial use needs a paid license). Targets ctranslate2/faster-whisper rather than whisper.cpp; verbatim-token behavior does not map cleanly to ggml. |
+| Gemma 3n/4 E2B | Rejected as primary | ~2.6–3 GB weights blow the bundled-size and 4 GB-RAM budgets; LiteRT-LM is retained as the alternate runtime instead |
+| Llama 3.2 3B Instruct | Rejected | ~2 GB weights + Llama Community License terms; MiniCPM5-1B is ~3× smaller with a cleaner license |
+| Moonshine (UsefulSensors) | Rejected for STT | Excellent on-device ASR but English-only — same Taglish blocker as CrisperWhisper |
+
+Selection rule: **llama.cpp + strict `alalay.action.v1` output contract** is the primary path (official GGUF, no custom ops, smallest footprint). If the spike shows poor instruction-following, switch to the `.litertlm` build for grammar-forced JSON — the parser/SafetyGate contract is identical either way (07-Agent-Specs §5).
 
 ## 3. Device Requirements
 
 | Item | Minimum | Recommended | Notes |
 |---|---|---|---|
-| RAM | 6 GB | 8 GB+ | E2B-class model + OS headroom; E4B needs ~12 GB |
-| Storage free | 4 GB | 6 GB | models + APK |
+| RAM | 4 GB | 6 GB+ | MiniCPM5-1B (~0.7 GB) + whisper-small (~0.2 GB) + OS headroom |
+| Storage free | 3 GB | 4 GB | APK with bundled models ~1 GB + extracted copy ~1 GB (peak ~2× during first-launch extraction) |
 | Android | API 29 (10) | API 33+ (13) | screenshot needs API 30 |
 | SoC | modern 8-core (Snapdragon 7-series / Tensor / Dimensity 8000-class or better) | NPU/GPU acceleration for LiteRT-LM | VERIFY delegate support on target |
 | Mic + speaker | required | — | PTT + TTS |
@@ -146,22 +156,27 @@ Accessibility service config: `canRetrieveWindowContent`, `canPerformGestures`, 
 | Screen dump | ≤500 ms | internal log |
 | Model load at app start | ≤20 s (background, non-blocking) | Diagnostics |
 
-## 6. Offline Requirements
+## 6. Offline Requirements and Model Bundling (DEC-11 resolved)
 
 - Zero network egress during operation (NFR-01): verified by airplane-mode AT-10 plus `NetworkStatsManager`/adb dumpsys egress check during AT-08.
-- Models loaded from app-private storage (`getFilesDir/models/`); load flow = copy from Files via Storage Access Framework — no downloader.
-- First-run check verifies model file SHA/presence and offline TTS voice; onboarding (FR-14) blocks agent use until both pass.
+- **Model delivery (DEC-11):** weights ship **inside the app** at `app/src/main/assets/models/` (`noCompress` — they are already dense; keeps `openFd` size queries working). No download step, no account, no manual copy — works offline immediately after install.
+- **First launch:** `ModelStore.stageAll()` extracts each bundled asset to `files/models/` (atomic tmp+rename), verifies expected size and a pinned SHA-256, then the planners pick the file up. Extraction is one-time, runs in the background during onboarding, and is re-verified on every cold start.
+- **Play-Store path:** the same `models/` content moves into a Play Asset Delivery `install-time` asset pack (base-APK limit is ~200 MB compressed; install-time packs keep "works offline after install" semantics with no user-visible download step). Sideloaded demo APKs ship weights directly in `assets/`.
+- First-run check verifies model presence/SHA and offline TTS voice; onboarding (FR-14) blocks agent use until both pass — but absence of the planner model degrades to RulesPlanner (T-23), not a hard block.
 
 ## 7. Build and Install
 
 ```bash
 # toolchain: Android Studio stable / cmdline-tools; JDK 17
 git clone <alalay-repo> && cd alalay
-# place models (downloaded on a PC BEFORE the event):
-#   files/models/planner.litertlm (or .gguf), files/models/whisper-base.bin
+# drop bundled weights (downloaded on a PC BEFORE the event — see
+# app/src/main/assets/models/README.md for sources; SHA-256 pinned in
+# ModelStore/AlalayAgent):
+#   app/src/main/assets/models/MiniCPM5-1B-Q4_K_M.gguf  (688 MB)
+#   app/src/main/assets/models/ggml-small-q5_1.bin    (190 MB)
 ./gradlew :app:assembleDebug           # assembleRelease for demo
 adb install -r app/build/outputs/apk/debug/app-debug.apk
-adb push files/models/* /sdcard/Android/data/com.alalay.app/files/models/
+# nothing to push — first launch extracts assets → files/models/
 ```
 
 Install-time steps mirrored in FR-14 onboarding: enable "Alalay Screen Control" (with restricted-settings workaround for side-loaded APK), grant mic, verify model+TTS.

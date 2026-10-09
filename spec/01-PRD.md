@@ -95,8 +95,8 @@ Priorities: **P0** = must ship in MVP (demo fails without it), **P1** = ship if 
 ## 8. Assumptions (ASSUMPTION — see Decisions to Confirm in 00-README)
 
 - **ASM-01** Target device: mid-to-high-range Android phone, ≥8 GB RAM, Android 13+ (API 33). Final device/RAM/Android version is DEC-01.
-- **ASM-02** Primary model: **Gemma 4 E2B via LiteRT-LM** per project direction — **VERIFY** model name/availability at event time; fallback chain defined in 06-TRD §4.
-- **ASM-03** whisper.cpp `tiny` or `base` with Filipino/Tagalog accuracy adequate for short commands — **VERIFY**; fallback is Android `SpeechRecognizer` with an on-device recognition pack.
+- **ASM-02** Primary model: **MiniCPM5-1B via llama.cpp** (GGUF Q4_K_M, Apache-2.0) — resolved per DEC-06 / 06-TRD §2 evaluation; fallback chain is Qwen3 1.7B → Gemma 3 1B. Weights are bundled in the app — no download step (DEC-11).
+- **ASM-03** whisper `small` multilingual via whisper.cpp (ggml q5_0, MIT) with Filipino/Tagalog accuracy adequate for short commands — resolved per DEC-07 (CrisperWhisper 2.0 rejected: EN/DE only, non-commercial weights). Fallback is Android `SpeechRecognizer` with an on-device recognition pack.
 - **ASM-04** Messaging target for the demo is a **purpose-built demo messaging app** ("Alalay Demo Messenger") unless real Messenger proves accessible in hour 0–2 testing (DEC-02).
 - **ASM-05** App id `com.alalay.app`, service label "Alalay Screen Control". Final name is DEC-03.
 
